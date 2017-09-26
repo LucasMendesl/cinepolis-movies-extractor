@@ -21,7 +21,9 @@ interface CinepolisData {
 }
 
 const BASE_URL = 'https://www.cinepolis.com.pe';
-const request = (configuration: AxiosRequestConfig) => Observable.fromPromise(axios(configuration));
+
+const request = (configuration: AxiosRequestConfig) : Observable<AxiosResponse> =>
+     Observable.fromPromise(axios(configuration));
 
 axios.defaults.headers.common['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36';
 axios.defaults.headers.common['Host'] = 'www.cinepolis.com.pe';
@@ -64,7 +66,7 @@ function buildResult (cinepolisData: any) : CinepolisData[] {
     let values = cinepolisData.map(cinepolis => {
         return cinepolis.dates.map(date => {
             return {
-                cinemaName: cinepolis.cinemaName,
+                name: cinepolis.name,
                 movies: date.Movies.map(x => {
                     return {
                         title: x.Title,
@@ -85,7 +87,7 @@ function mapToResult (data: any[]) : CinepolisResult {
         result: data.map(obj => {
             return obj.d.Cinemas.map(cinema => {
                 return {
-                   cinemaName: cinema.Name,
+                   name: cinema.Name,
                    dates: cinema.Dates
                 }
             });

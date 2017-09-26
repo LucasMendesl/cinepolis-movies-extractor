@@ -1,8 +1,8 @@
 import * as program from 'commander';
 import { red, green } from 'colors';
-import { extname, join, dirname } from 'path';
-import { writeFileSync, existsSync } from 'fs';
-import { cinepolisMovies } from './cinepolis';
+import { extname, join, resolve } from 'path';
+import { writeFile, existsSync } from 'fs';
+import cinepolisMovies from './cinepolis';
 
 const errorMessage = (message: string) : void => console.log(red(message));
 
@@ -20,22 +20,28 @@ const getPath = () : string => {
         errorMessage('✗ Error: no such directory with this name!'); 
         process.exit(-1); 
     }
-    
-    console.log(`dirname: ${dirname(program.directory), fileName}`);
-    return join(dirname(program.directory), fileName);
+
+    return join(resolve(program.directory), fileName);
 } 
 
-let movies = cinepolisMovies()
-    .subscribe(
-        next => {
-            let filePath = getPath();            
-            writeFileSync(filePath, JSON.stringify(next, null, 4));            
-            
-            console.log(green(`✔ Success: file has saved in directory ${filePath}`));
-            process.exit(0);
-        },
-        error => {
-            errorMessage(`✗ Error: ${error}`);
-            process.exit(-1);
+const saveFile = (next: any) : void => {
+    let filePath = getPath();
+    
+    writeFile(filePath, JSON.stringify(next, null, 4), (err) => {
+        if (err) {
+           errorMessage(`✗ Error: ${err.message}`);
+           process.exit(-1);
         }
-);
+    
+        console.log(green(`✔ Success: file has saved in directory ${filePath}`));
+        process.exit(0);    
+    });                            
+}
+
+const handleError = (error: any) => {
+    errorMessage(`✗ Error: ${error}`);
+    process.exit(-1);
+}
+
+cinepolisMovies()
+    .subscribe(saveFile, handleError);   

@@ -96,7 +96,7 @@ function mapToResult (data: any[]) : CinepolisResult {
     };
 }
 
-export function cinepolisMovies () : Observable<CinepolisObservableResponse> {
+export default function cinepolisMovies () : Observable<CinepolisObservableResponse> {
     return getCinepolisCities()
             .flatMap(getMovies)
             .map(mapToResult)
